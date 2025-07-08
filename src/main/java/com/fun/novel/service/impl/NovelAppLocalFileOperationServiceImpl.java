@@ -36,7 +36,7 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
         String platform = baseConfig.getPlatform();
         processPrebuildBuildDir(taskId, buildCode, platform, baseConfig, rollbackActions, withLogAndDelay);
         processThemeFile(taskId, buildCode, baseConfig, rollbackActions, withLogAndDelay);
-        processDouyinPrefetchFile(taskId, buildCode, platform, rollbackActions, withLogAndDelay);
+        //processDouyinPrefetchFile(taskId, buildCode, platform, rollbackActions, withLogAndDelay);
         processBaseConfigFile(taskId, buildCode, platform, baseConfig, commonConfig, rollbackActions, withLogAndDelay);
         processAdConfigFile(taskId, buildCode, platform, params.getAdConfig(), rollbackActions, withLogAndDelay);
         processPayConfigFile(taskId, buildCode, platform, params.getPaymentConfig(), rollbackActions, withLogAndDelay);
@@ -107,7 +107,7 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
             try { Thread.sleep(FILE_STEP_DELAY_MS); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
         }
         String prebuildDir = buildWorkPath + File.separator + "prebuild" + File.separator + "build";
-        String srcDir = prebuildDir + File.separator + "sample";
+        String srcDir = prebuildDir + File.separator + "ysp";
         String destDir = prebuildDir + File.separator + buildCode;
         try {
             Path destPath = java.nio.file.Paths.get(destDir);

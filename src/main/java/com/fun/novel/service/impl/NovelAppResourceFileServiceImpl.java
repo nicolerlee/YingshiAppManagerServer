@@ -35,7 +35,7 @@ public class NovelAppResourceFileServiceImpl implements NovelAppResourceFileServ
         String imgDir = buildWorkPath + File.separator + "src" + File.separator + "static";
         CreateNovelAppRequest.CommonConfig commonConfig = params.getCommonConfig();
         String buildCode = commonConfig.getBuildCode();
-        String imgSrcDir = imgDir + File.separator + "img-sample";
+        String imgSrcDir = imgDir + File.separator + "img-ysp";
         String imgDestDir = imgDir + File.separator + "img-" + buildCode;
         java.nio.file.Path destPath = java.nio.file.Paths.get(imgDestDir);
         java.nio.file.Path srcPath = java.nio.file.Paths.get(imgSrcDir);
