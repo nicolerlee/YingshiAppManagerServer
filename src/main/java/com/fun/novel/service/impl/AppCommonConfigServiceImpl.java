@@ -3,7 +3,9 @@ package com.fun.novel.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fun.novel.dto.AppCommonConfigDTO;
 import com.fun.novel.entity.AppCommonConfig;
+import com.fun.novel.entity.AppTheme;
 import com.fun.novel.mapper.AppCommonConfigMapper;
+import com.fun.novel.mapper.AppThemeMapper;
 import com.fun.novel.service.AppCommonConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,7 @@ import java.time.LocalDateTime;
 public class AppCommonConfigServiceImpl implements AppCommonConfigService {
 
     private final AppCommonConfigMapper appCommonConfigMapper;
+    private final AppThemeMapper appThemeMapper;
 
     @Override
     public AppCommonConfig createAppCommonConfig(AppCommonConfigDTO dto) {
@@ -49,6 +52,14 @@ public class AppCommonConfigServiceImpl implements AppCommonConfigService {
         LambdaQueryWrapper<AppCommonConfig> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(AppCommonConfig::getAppId, appid);
         return appCommonConfigMapper.selectOne(wrapper);
+    }
+
+    // peng
+    @Override
+    public AppTheme getAppTheme(String buildCode) {
+        LambdaQueryWrapper<AppTheme> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AppTheme::getBrand, buildCode);
+        return appThemeMapper.selectOne(wrapper);
     }
 
     @Override

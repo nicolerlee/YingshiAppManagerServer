@@ -2,6 +2,7 @@ package com.fun.novel.service;
 
 import com.fun.novel.dto.AppCommonConfigDTO;
 import com.fun.novel.entity.AppCommonConfig;
+import com.fun.novel.entity.AppTheme;
 
 public interface AppCommonConfigService {
 
@@ -32,4 +33,6 @@ public interface AppCommonConfigService {
      * @return 更新后的配置实体
      */
     AppCommonConfig updateAppCommonConfig(AppCommonConfigDTO dto);
+
+    AppTheme getAppTheme(String buildCode);
 } 
