@@ -2,6 +2,7 @@ package com.fun.novel.service.impl;
 
 import com.fun.novel.dto.CreateNovelAppRequest;
 import com.fun.novel.entity.AppTheme;
+import com.fun.novel.entity.PayDlg;
 import com.fun.novel.service.AppCommonConfigService;
 import com.fun.novel.service.NovelAppLocalFileOperationService;
 import com.fun.novel.utils.CreateNovelTaskLogger;
@@ -107,12 +108,28 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
 
 
     // peng
-    private void overwriteThemeFile(String taskId, String buildCode, List<Runnable> rollbackActions, boolean withLogAndDelay) {
-        AppTheme appTheme = appCommonConfigService.getAppTheme(buildCode);
-        if (appTheme == null) return;
+    private void overwriteThemeFile(String taskId, String brand, List<Runnable> rollbackActions, boolean withLogAndDelay) {
+        AppTheme appTheme = appCommonConfigService.getAppTheme(brand);
+        PayDlg payDlg = appCommonConfigService.getPayDlg(brand);
+        if (payDlg == null) {
+            taskLogger.log(taskId, "[2-2-1-0] theme数据为空，啥也不做, brand=" + brand, CreateNovelLogType.INFO);
+            return;
+        }
         taskLogger.log(taskId, "[2-2-1-1] 获取到apptheme", CreateNovelLogType.INFO);
         // add theme file
-        String themeFilePath = buildWorkPath + File.separator + miniConfigPath + File.separator + "theme" + File.separator + buildCode + ".less";
+        String themeFolderStr = buildWorkPath + File.separator + miniConfigPath + File.separator + "theme";
+        java.nio.file.Path themeFolderPath = java.nio.file.Paths.get(themeFolderStr);
+        try {
+            // 判断文件夹是否存在
+            if (!java.nio.file.Files.exists(themeFolderPath)) {
+                // 创建多级文件夹
+                java.nio.file.Files.createDirectories(themeFolderPath);
+            }
+        } catch (java.io.IOException e) {
+            taskLogger.log(taskId, "[2-2-1] 主题文件夹 " + themeFolderStr + " 创建失败: " + e.getMessage(), CreateNovelLogType.ERROR);
+            throw new RuntimeException("主题文件夹创建失败: " + e.getMessage(), e);
+        }
+        String themeFilePath = themeFolderStr + File.separator + brand + ".less";
         java.nio.file.Path themePath = java.nio.file.Paths.get(themeFilePath);
         String backupPath = themeFilePath + ".bak";
         try {
@@ -139,24 +156,7 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
             if (sValue != null && sValue.length() > 0) lines.add("@theme-top-color: " + sValue + ";");
             sValue = appTheme.getThemeTopGradient();
             if (sValue != null && sValue.length() > 0) lines.add("@theme-top-gradient: " + sValue + ";");
-            sValue = appTheme.getPdTopColor();
-            if (sValue != null && sValue.length() > 0) lines.add("@pd-top-color: " + sValue + ";");
-            sValue = appTheme.getPdTopGradient();
-            if (sValue != null && sValue.length() > 0) lines.add("@pd-top-gradient: " + sValue + ";");
-            sValue = appTheme.getPdItemColor();
-            if (sValue != null && sValue.length() > 0) lines.add("@pd-item-color: " + sValue + ";");
-            sValue = appTheme.getPdItemSelcolor();
-            if (sValue != null && sValue.length() > 0) lines.add("@pd-item-selcolor: " + sValue + ";");
-            sValue = appTheme.getPdItemBorder();
-            if (sValue != null && sValue.length() > 0) lines.add("@pd-item-border: " + sValue + ";");
-            sValue = appTheme.getPdItemSelBorder();
-            if (sValue != null && sValue.length() > 0) lines.add("@pd-item-selborder: " + sValue + ";");
-            Integer value = appTheme.getPdItemWidth();
-            sValue = value == null ? "" : String.valueOf(value);
-            if (sValue != null && sValue.length() > 0) lines.add("@pd-item-width: " + sValue + ";");
-            value = appTheme.getPdItemSelWidth();
-            sValue = value == null ? "" : String.valueOf(value);
-            if (sValue != null && sValue.length() > 0) lines.add("@pd-item-selwidth: " + sValue + ";");
+            payDlg.appendCssOn(lines);
             java.nio.file.Files.write(themePath, lines, java.nio.charset.StandardCharsets.UTF_8);
             java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(backupPath));
         } catch (Exception e) {
@@ -358,6 +358,10 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
     }
     // 2. processThemeFile
     private void processThemeFile(String taskId, String buildCode, CreateNovelAppRequest.BaseConfig baseConfig, List<Runnable> rollbackActions, boolean withLogAndDelay) {
+        if (true) { // peng
+            overwriteThemeFile(taskId, buildCode, rollbackActions, withLogAndDelay);
+            return;
+        }
         if (withLogAndDelay) {
             taskLogger.log(taskId, "[2-2] 开始处理主题文件: " + buildWorkPath + File.separator + miniConfigPath + File.separator + "theme.less", CreateNovelLogType.PROCESSING);
             try { Thread.sleep(FILE_STEP_DELAY_MS); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
@@ -380,8 +384,6 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
             if (withLogAndDelay) {
                 try { Thread.sleep(FILE_STEP_DELAY_MS); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
             }
-            // peng
-            overwriteThemeFile(taskId, buildCode, rollbackActions, withLogAndDelay);
             // 读取原内容
             java.util.List<String> lines = java.nio.file.Files.readAllLines(themePath, java.nio.charset.StandardCharsets.UTF_8);
             // 构造新主题色变量

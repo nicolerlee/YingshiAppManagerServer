@@ -4,8 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fun.novel.dto.AppCommonConfigDTO;
 import com.fun.novel.entity.AppCommonConfig;
 import com.fun.novel.entity.AppTheme;
+import com.fun.novel.entity.PayBoard3;
+import com.fun.novel.entity.PayDlg;
 import com.fun.novel.mapper.AppCommonConfigMapper;
 import com.fun.novel.mapper.AppThemeMapper;
+import com.fun.novel.mapper.PayBoard3Mapper;
+import com.fun.novel.mapper.PayDlgMapper;
 import com.fun.novel.service.AppCommonConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +24,11 @@ import java.time.LocalDateTime;
 public class AppCommonConfigServiceImpl implements AppCommonConfigService {
 
     private final AppCommonConfigMapper appCommonConfigMapper;
+    // peng ->
     private final AppThemeMapper appThemeMapper;
+    private final PayDlgMapper payDlgMapper;
+    private final PayBoard3Mapper payBoard3Mapper;
+    // peng <-
 
     @Override
     public AppCommonConfig createAppCommonConfig(AppCommonConfigDTO dto) {
@@ -54,13 +62,31 @@ public class AppCommonConfigServiceImpl implements AppCommonConfigService {
         return appCommonConfigMapper.selectOne(wrapper);
     }
 
-    // peng
+    // peng -->
     @Override
-    public AppTheme getAppTheme(String buildCode) {
+    public AppTheme getAppTheme(String brand) {
         LambdaQueryWrapper<AppTheme> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(AppTheme::getBrand, buildCode);
+        wrapper.eq(AppTheme::getBrand, brand);
         return appThemeMapper.selectOne(wrapper);
     }
+    @Override
+    public PayDlg getPayDlg(String brand) {
+        LambdaQueryWrapper<PayDlg> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(PayDlg::getBrand, brand);
+        PayDlg payDlg = payDlgMapper.selectOne(wrapper);
+        if (payDlg == null) {
+            return null;
+        }
+        String payBox = payDlg.getPayBoard();
+        if (payBox != null && payBox.equals("pay_board3")) {
+            LambdaQueryWrapper<PayBoard3> wrapper3 = new LambdaQueryWrapper<>();
+            wrapper3.eq(PayBoard3::getBrand, brand);
+            PayBoard3 payBoard3 = payBoard3Mapper.selectOne(wrapper3);
+            payDlg.setPayBoard3(payBoard3);
+        }
+        return payDlg;
+    }
+    // <-- peng
 
     @Override
     public boolean deleteAppCommonConfig(String appId) {

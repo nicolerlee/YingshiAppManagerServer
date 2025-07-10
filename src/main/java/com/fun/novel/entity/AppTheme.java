@@ -1,14 +1,10 @@
 package com.fun.novel.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fun.novel.validation.UniqueAppId;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.time.LocalDateTime;
 
 @Data
 @TableName("app_theme")
@@ -37,9 +33,9 @@ public class AppTheme {
     @Schema(description = "支付框顶部色")
     private String pdTopColor;
 
-    @TableField("pd_top_gradient")
+    @TableField("pd_bg_color")
     @Schema(description = "支付框顶部色")
-    private String pdTopGradient;
+    private String pdBgColor;
 
     @TableField("pd_item_color")
     @Schema(description = "支付框顶部色")

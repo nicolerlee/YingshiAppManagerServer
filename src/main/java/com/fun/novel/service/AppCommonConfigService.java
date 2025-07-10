@@ -3,6 +3,7 @@ package com.fun.novel.service;
 import com.fun.novel.dto.AppCommonConfigDTO;
 import com.fun.novel.entity.AppCommonConfig;
 import com.fun.novel.entity.AppTheme;
+import com.fun.novel.entity.PayDlg;
 
 public interface AppCommonConfigService {
 
@@ -34,5 +35,6 @@ public interface AppCommonConfigService {
      */
     AppCommonConfig updateAppCommonConfig(AppCommonConfigDTO dto);
 
-    AppTheme getAppTheme(String buildCode);
+    AppTheme getAppTheme(String brand);
+    PayDlg getPayDlg(String brand);
 } 
