@@ -5,6 +5,7 @@ import com.fun.novel.entity.AppTheme;
 import com.fun.novel.entity.PayBoard3;
 import com.fun.novel.entity.PayDlg;
 import com.fun.novel.service.AppCommonConfigService;
+import com.fun.novel.service.AppThemeService;
 import com.fun.novel.service.NovelAppLocalFileOperationService;
 import com.fun.novel.utils.CreateNovelTaskLogger;
 import com.fun.novel.dto.CreateNovelLogType;
@@ -22,6 +23,8 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
     private CreateNovelTaskLogger taskLogger;
     @Autowired
     private AppCommonConfigService appCommonConfigService;
+    @Autowired
+    private AppThemeService appThemeService;
 
     @Value("${build.workPath}")
     private String buildWorkPath;
@@ -114,69 +117,6 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
         taskLogger.log(taskId, "[2-2-1-1] 生成theme的css文件, brand=" + brand, CreateNovelLogType.INFO);
         String themeFilePath = themeFolder + File.separator + brand + ".less";
     }
-    // peng
-    private void overwriteThemeFile(String taskId, String brand, List<Runnable> rollbackActions, boolean withLogAndDelay) {
-        AppTheme appTheme = appCommonConfigService.getAppTheme(brand);
-        PayDlg payDlg = appCommonConfigService.getPayDlg(brand);
-        if (payDlg == null) {
-            taskLogger.log(taskId, "[2-2-1-0] theme数据为空，啥也不做, brand=" + brand, CreateNovelLogType.INFO);
-            return;
-        }
-        taskLogger.log(taskId, "[2-2-1-1] 获取到apptheme", CreateNovelLogType.INFO);
-        // add theme file
-        String themeFolderStr = buildWorkPath + File.separator + miniConfigPath + File.separator + "theme";
-        java.nio.file.Path themeFolderPath = java.nio.file.Paths.get(themeFolderStr);
-        try {
-            // 判断文件夹是否存在
-            if (!java.nio.file.Files.exists(themeFolderPath)) {
-                // 创建多级文件夹
-                java.nio.file.Files.createDirectories(themeFolderPath);
-            }
-        } catch (java.io.IOException e) {
-            taskLogger.log(taskId, "[2-2-1] 主题文件夹 " + themeFolderStr + " 创建失败: " + e.getMessage(), CreateNovelLogType.ERROR);
-            throw new RuntimeException("主题文件夹创建失败: " + e.getMessage(), e);
-        }
-        String themeFilePath = themeFolderStr + File.separator + brand + ".less";
-        java.nio.file.Path themePath = java.nio.file.Paths.get(themeFilePath);
-        String backupPath = themeFilePath + ".bak";
-        try {
-            if (java.nio.file.Files.exists(themePath)) {
-                // 备份原文件
-                java.nio.file.Files.copy(themePath, java.nio.file.Paths.get(backupPath), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                // 立即添加回滚动作，确保后续任何失败都能回滚主题文件
-                rollbackActions.add(() -> {
-                    try {
-                        taskLogger.log(taskId, "回滚动作：还原主题文件",CreateNovelLogType.ERROR);
-                        java.nio.file.Files.copy(java.nio.file.Paths.get(backupPath), themePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                        java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(backupPath));
-                    } catch (Exception ignore) {}
-                });
-                taskLogger.log(taskId, "[2-2-1] 备份主题文件完成", CreateNovelLogType.INFO);
-                if (withLogAndDelay) {
-                    try { Thread.sleep(FILE_STEP_DELAY_MS); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
-                }
-            }
-            // 读取原内容
-            java.util.List<String> lines = new java.util.ArrayList<>();
-            // 构造新主题色变量
-            String sValue = appTheme.getThemeTopColor();
-            if (sValue != null && sValue.length() > 0) lines.add("@theme-top-color: " + sValue + ";");
-            sValue = appTheme.getThemeTopGradient();
-            if (sValue != null && sValue.length() > 0) lines.add("@theme-top-gradient: " + sValue + ";");
-            payDlg.appendCssOn(lines);
-            PayBoard3 payBoard3 = appCommonConfigService.getPayBoard3(brand);
-            if (payBoard3 != null) {
-                payBoard3.appendCssOn(lines);
-            }
-            java.nio.file.Files.write(themePath, lines, java.nio.charset.StandardCharsets.UTF_8);
-            java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(backupPath));
-        } catch (Exception e) {
-            // 还原自身
-            try { java.nio.file.Files.copy(java.nio.file.Paths.get(backupPath), themePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING); } catch (Exception ignore) {}
-            throw new RuntimeException("主题文件2处理失败: " + e.getMessage(), e);
-        }
-    }
-
 
     // 以下为迁移自NovelAppCreationServiceImpl的所有私有方法和工具方法
     // 1. processPrebuildBuildDir
@@ -369,67 +309,7 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
     }
     // 2. processThemeFile
     private void processThemeFile(String taskId, String buildCode, CreateNovelAppRequest.BaseConfig baseConfig, List<Runnable> rollbackActions, boolean withLogAndDelay) {
-        if (true) { // peng
-            overwriteThemeFile(taskId, buildCode, rollbackActions, withLogAndDelay);
-            return;
-        }
-        if (withLogAndDelay) {
-            taskLogger.log(taskId, "[2-2] 开始处理主题文件: " + buildWorkPath + File.separator + miniConfigPath + File.separator + "theme.less", CreateNovelLogType.PROCESSING);
-            try { Thread.sleep(FILE_STEP_DELAY_MS); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
-        }
-        String themeFilePath = buildWorkPath + File.separator + miniConfigPath + File.separator + "theme.less";
-        java.nio.file.Path themePath = java.nio.file.Paths.get(themeFilePath);
-        String backupPath = themeFilePath + ".bak";
-        try {
-            // 备份原文件
-            java.nio.file.Files.copy(themePath, java.nio.file.Paths.get(backupPath), java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            // 立即添加回滚动作，确保后续任何失败都能回滚主题文件
-            rollbackActions.add(() -> {
-                try {
-                    taskLogger.log(taskId, "回滚动作：还原主题文件",CreateNovelLogType.ERROR);
-                    java.nio.file.Files.copy(java.nio.file.Paths.get(backupPath), themePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(backupPath));
-                } catch (Exception ignore) {}
-            });
-            taskLogger.log(taskId, "[2-2-1] 备份主题文件完成", CreateNovelLogType.INFO);
-            if (withLogAndDelay) {
-                try { Thread.sleep(FILE_STEP_DELAY_MS); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
-            }
-            // 读取原内容
-            java.util.List<String> lines = java.nio.file.Files.readAllLines(themePath, java.nio.charset.StandardCharsets.UTF_8);
-            // 构造新主题色变量
-            String mainTheme = baseConfig.getMainTheme();
-            String secondTheme = baseConfig.getSecondTheme();
-            String line1 = "@primary-color-" + buildCode + ": " + mainTheme + ";";
-            String line2 = "@second-color-" + buildCode + ": " + secondTheme + ";";
-            boolean foundPrimary = false, foundSecond = false;
-            for (int i = 0; i < lines.size(); i++) {
-                String line = lines.get(i).trim();
-                if (line.startsWith("@primary-color-" + buildCode + ":")) {
-                    lines.set(i, line1);
-                    foundPrimary = true;
-                }
-                if (line.startsWith("@second-color-" + buildCode + ":")) {
-                    lines.set(i, line2);
-                    foundSecond = true;
-                }
-            }
-            if (!foundPrimary) lines.add(line1);
-            if (!foundSecond) lines.add(line2);
-            // 写回文件
-            java.nio.file.Files.write(themePath, lines, java.nio.charset.StandardCharsets.UTF_8);
-            taskLogger.log(taskId, "[2-2-2] 新增主题色变量完成", CreateNovelLogType.SUCCESS);
-            taskLogger.log(taskId, "[2-2-3] 新增内容：\n" + line1 + "\n" + line2, CreateNovelLogType.INFO);
-            if (withLogAndDelay) {
-                try { Thread.sleep(FILE_STEP_DELAY_MS); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
-            }
-            // 操作成功后删除theme.bak
-            try { java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(backupPath)); } catch (Exception ignore) {}
-        } catch (Exception e) {
-            // 还原自身
-            try { java.nio.file.Files.copy(java.nio.file.Paths.get(backupPath), themePath, java.nio.file.StandardCopyOption.REPLACE_EXISTING); } catch (Exception ignore) {}
-            throw new RuntimeException("主题文件处理失败: " + e.getMessage(), e);
-        }
+        appThemeService.processThemeFile(taskId, buildCode, baseConfig, rollbackActions, withLogAndDelay);
     }
     // 3. processDouyinPrefetchFile
     private void processDouyinPrefetchFile(String taskId, String buildCode, String platform, List<Runnable> rollbackActions, boolean withLogAndDelay) {
