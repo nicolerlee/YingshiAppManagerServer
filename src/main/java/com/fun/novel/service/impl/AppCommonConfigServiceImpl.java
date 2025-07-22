@@ -73,18 +73,13 @@ public class AppCommonConfigServiceImpl implements AppCommonConfigService {
     public PayDlg getPayDlg(String brand) {
         LambdaQueryWrapper<PayDlg> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(PayDlg::getBrand, brand);
-        PayDlg payDlg = payDlgMapper.selectOne(wrapper);
-        if (payDlg == null) {
-            return null;
-        }
-        String payBox = payDlg.getPayBoard();
-        if (payBox != null && payBox.equals("pay_board3")) {
-            LambdaQueryWrapper<PayBoard3> wrapper3 = new LambdaQueryWrapper<>();
-            wrapper3.eq(PayBoard3::getBrand, brand);
-            PayBoard3 payBoard3 = payBoard3Mapper.selectOne(wrapper3);
-            payDlg.setPayBoard3(payBoard3);
-        }
-        return payDlg;
+        return payDlgMapper.selectOne(wrapper);
+    }
+    @Override
+    public PayBoard3 getPayBoard3(String brand) {
+        LambdaQueryWrapper<PayBoard3> wrapper3 = new LambdaQueryWrapper<>();
+        wrapper3.eq(PayBoard3::getBrand, brand);
+        return payBoard3Mapper.selectOne(wrapper3);
     }
     // <-- peng
 

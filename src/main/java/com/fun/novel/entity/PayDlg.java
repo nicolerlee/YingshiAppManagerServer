@@ -1,6 +1,9 @@
 package com.fun.novel.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -107,8 +110,16 @@ public class PayDlg {
     @Schema(description = "支付框信息")
     private String payBoard;
 
+    @TableField("pay_board_color")
+    @Schema(description = "支付框颜色")
+    private String payBoardColor;
+
+    @TableField("pay_board_shadow")
+    @Schema(description = "支付框阴影")
+    private String payBoardShadow;
+
     @TableField(exist = false)
-    private PayBoard3 payBoard3;
+    private PayBoard3 payBoard3; // 弃用
 
     public void appendCssOn(List<String> lines) {
         String sValue;
@@ -229,7 +240,7 @@ public class PayDlg {
             lines.add("@pd-notice-t3-size: " + sValue + "rpx;");
         }
 
-        // notice_color
+        // notice_service_color
         sValue = this.getNoticeServiceColor();
         if (sValue != null && !sValue.isEmpty()) {
             lines.add("@pd-notice-service-color: " + sValue + ";");
@@ -241,9 +252,16 @@ public class PayDlg {
             lines.add("@pd-notice-color: " + sValue + ";");
         }
 
-        // 支付框信息
-        if (payBoard3 != null) {
-            payBoard3.appendCssOn("pd-", lines);
+        // 支付框颜色
+        sValue = this.getPayBoardColor();
+        if (sValue != null && !sValue.isEmpty()) {
+            lines.add("@pd-pay-board-color: " + sValue + ";");
+        }
+
+        // 支付框阴影
+        sValue = this.getPayBoardShadow();
+        if (sValue != null && !sValue.isEmpty()) {
+            lines.add("@pd-pay-board-shadow: " + sValue + ";");
         }
     }
 }

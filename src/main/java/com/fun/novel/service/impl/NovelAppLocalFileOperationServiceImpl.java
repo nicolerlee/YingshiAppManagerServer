@@ -2,6 +2,7 @@ package com.fun.novel.service.impl;
 
 import com.fun.novel.dto.CreateNovelAppRequest;
 import com.fun.novel.entity.AppTheme;
+import com.fun.novel.entity.PayBoard3;
 import com.fun.novel.entity.PayDlg;
 import com.fun.novel.service.AppCommonConfigService;
 import com.fun.novel.service.NovelAppLocalFileOperationService;
@@ -107,6 +108,12 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
     }
 
 
+    private void overwriteAppTheme(String themeFolder, String taskId, String brand, boolean withLogAndDelay) {
+        AppTheme appTheme = appCommonConfigService.getAppTheme(brand);
+        if (appTheme == null) return;
+        taskLogger.log(taskId, "[2-2-1-1] 生成theme的css文件, brand=" + brand, CreateNovelLogType.INFO);
+        String themeFilePath = themeFolder + File.separator + brand + ".less";
+    }
     // peng
     private void overwriteThemeFile(String taskId, String brand, List<Runnable> rollbackActions, boolean withLogAndDelay) {
         AppTheme appTheme = appCommonConfigService.getAppTheme(brand);
@@ -157,6 +164,10 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
             sValue = appTheme.getThemeTopGradient();
             if (sValue != null && sValue.length() > 0) lines.add("@theme-top-gradient: " + sValue + ";");
             payDlg.appendCssOn(lines);
+            PayBoard3 payBoard3 = appCommonConfigService.getPayBoard3(brand);
+            if (payBoard3 != null) {
+                payBoard3.appendCssOn(lines);
+            }
             java.nio.file.Files.write(themePath, lines, java.nio.charset.StandardCharsets.UTF_8);
             java.nio.file.Files.deleteIfExists(java.nio.file.Paths.get(backupPath));
         } catch (Exception e) {

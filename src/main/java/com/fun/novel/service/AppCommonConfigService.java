@@ -3,6 +3,7 @@ package com.fun.novel.service;
 import com.fun.novel.dto.AppCommonConfigDTO;
 import com.fun.novel.entity.AppCommonConfig;
 import com.fun.novel.entity.AppTheme;
+import com.fun.novel.entity.PayBoard3;
 import com.fun.novel.entity.PayDlg;
 
 public interface AppCommonConfigService {
@@ -37,4 +38,5 @@ public interface AppCommonConfigService {
 
     AppTheme getAppTheme(String brand);
     PayDlg getPayDlg(String brand);
+    PayBoard3 getPayBoard3(String brand);
 } 

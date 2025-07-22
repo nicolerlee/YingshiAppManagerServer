@@ -26,14 +26,6 @@ public class PayBoard3 {
     @Schema(description = "品牌标识")
     private String brand;
 
-    @TableField("color")
-    @Schema(description = "颜色")
-    private String color;
-
-    @TableField("shadow")
-    @Schema(description = "阴影")
-    private String shadow;
-
     @TableField("text_bg")
     @Schema(description = "文本背景")
     private String textBg;
@@ -73,25 +65,12 @@ public class PayBoard3 {
     /**
      * 将 PayBoard3 对象的字段转换为 CSS 样式并附加到 lines 列表中。
      *
-     * @param prefix 存储 CSS 样式的前缀
      * @param lines 存储 CSS 样式的列表
      */
-    public void appendCssOn(String prefix, List<String> lines) {
+    public void appendCssOn(List<String> lines) {
         String sValue;
         Integer value;
-        String fullPrefix = prefix + "pb3-";
-
-        // 颜色
-        sValue = this.getColor();
-        if (sValue != null && !sValue.isEmpty()) {
-            lines.add("@" + fullPrefix + "color: " + sValue + ";");
-        }
-
-        // 阴影
-        sValue = this.getShadow();
-        if (sValue != null && !sValue.isEmpty()) {
-            lines.add("@" + fullPrefix + "shadow: " + sValue + ";");
-        }
+        String fullPrefix = "pb3-";
 
         // 文本背景
         sValue = this.getTextBg();
