@@ -11,11 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@TableName("pay6")
-@Schema(description = "pay6表实体")
-public class Pay6 extends ThemeEntity {
-    Pay6() {
-        setComponentStyle(new ComponentStyle("6", ComponentStyle.Type.Pay6));
+@TableName("pay66")
+@Schema(description = "pay66表实体")
+public class Pay66 extends ThemeEntity {
+    Pay66() {
+        setComponentStyle(new ComponentStyle("66", ComponentStyle.Type.Pay66));
     }
 
     @TableField("id")
@@ -24,31 +24,22 @@ public class Pay6 extends ThemeEntity {
 
     @TableId(type = IdType.INPUT)
     @TableField("brand")
-    @Schema(description = "小程序代码唯一标识")
+    @Schema(description = "小程序唯一标识")
     private String brand;
 
     @TableField("pay_board_id")
-    @Schema(description = "支付盘类型")
+    @Schema(description = "支付盘id，表征应用哪个支付盘")
     private Integer payBoardId;
 
     @TableField("pay_board_style")
-    @Schema(description = "选取样式id")
+    @Schema(description = "支付盘样式，表征应用哪个支付盘样式")
     private Integer payBoardStyle;
-
-    @TableField("pay_item_id")
-    @Schema(description = "套餐类型id")
-    private Integer payItemId;
-
-    @TableField("pay_item_style")
-    @Schema(description = "选取样式id")
-    private Integer payItemStyle;
 
     // 将除brand/id外的字段，转换为List<ComponentStyle>的结果形式
     @Override
     public List<ComponentStyle> buildComponentStyles() {
         List<ComponentStyle> styles = new ArrayList<>();
         styles.add(new ComponentStyle("pay-board", ComponentStyle.Type.payBoard, this.payBoardId, this.payBoardStyle));
-        styles.add(new ComponentStyle("pay-item", ComponentStyle.Type.pay6Item, this.payItemId, this.payItemStyle));
         return styles;
     }
-} 
+}
