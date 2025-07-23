@@ -20,4 +20,10 @@ public class CreateNovelTaskLogger {
         messagingTemplate.convertAndSend(destination, CreateNovelLogMessage.from(message, type));
         logger.info("[NovelCreateLog] taskId={} message={}", taskId, message);
     }
+
+    public void warn(String taskId, String message, CreateNovelLogType type) {
+        String destination = "/topic/novel-create-log/" + taskId;
+        messagingTemplate.convertAndSend(destination, CreateNovelLogMessage.from(message, type));
+        logger.warn("[NovelCreateLog] taskId={} message={}", taskId, message);
+    }
 } 

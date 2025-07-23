@@ -80,7 +80,8 @@ public class NovelAppController {
             //更新appConfig,更新deliverConfig,更新主题色,更新pages-xx.json文件
             novelAppLocalFileOperationService.updateBaseConfigLocalCodeFiles(params, rollbackActions);
             //根据主题色处理资源文件
-            novelAppResourceFileService.processAllResourceFilesSimple(params, rollbackActions);
+            // peng: 修改配置的时候，不替换更新资源文件夹
+            //novelAppResourceFileService.processAllResourceFilesSimple(params, rollbackActions);
             return Result.success("应用修改成功", updatedApp);
         } catch (Exception e) {
             // 回滚所有文件操作

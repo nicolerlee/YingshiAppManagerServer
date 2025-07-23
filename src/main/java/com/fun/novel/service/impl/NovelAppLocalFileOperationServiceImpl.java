@@ -131,7 +131,10 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
         try {
             Path destPath = java.nio.file.Paths.get(destDir);
             if (java.nio.file.Files.exists(destPath)) {
-                deleteDirectoryRecursively(destPath);
+                // peng：预编译文件夹已存在的情况下，不用删除再重新复制
+                //deleteDirectoryRecursively(destPath);
+                taskLogger.log(taskId, "[2-1-1] prebuild/build/" + buildCode + "文件夹已存在，什么都不做", CreateNovelLogType.PROCESSING);
+                return;
             }
             java.nio.file.Files.createDirectories(destPath);
             // 立即添加回滚动作，确保后续任何失败都能回滚buildCode目录

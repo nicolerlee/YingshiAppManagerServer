@@ -35,20 +35,20 @@ public class Pay6 extends ThemeEntity {
     @Schema(description = "选取样式id")
     private Integer payBoardStyle;
 
-    @TableField("pay_item_id")
+    @TableField("good_item_id")
     @Schema(description = "套餐类型id")
-    private Integer payItemId;
+    private Integer goodItemId;
 
-    @TableField("pay_item_style")
+    @TableField("good_item_style")
     @Schema(description = "选取样式id")
-    private Integer payItemStyle;
+    private Integer goodItemStyle;
 
     // 将除brand/id外的字段，转换为List<ComponentStyle>的结果形式
     @Override
     public List<ComponentStyle> buildComponentStyles() {
         List<ComponentStyle> styles = new ArrayList<>();
         styles.add(new ComponentStyle("pay-board", ComponentStyle.Type.payBoard, this.payBoardId, this.payBoardStyle));
-        styles.add(new ComponentStyle("pay-item", ComponentStyle.Type.pay6Item, this.payItemId, this.payItemStyle));
+        styles.add(new ComponentStyle("good-item", ComponentStyle.Type.pay6Item, this.goodItemId, this.goodItemStyle));
         return styles;
     }
 } 
