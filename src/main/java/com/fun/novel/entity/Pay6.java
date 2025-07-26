@@ -15,7 +15,7 @@ import java.util.List;
 @Schema(description = "pay6表实体")
 public class Pay6 extends ThemeEntity {
     Pay6() {
-        setComponentStyle(new ComponentStyle("6", ComponentStyle.Type.Pay6));
+        setComponentStyle(new ComponentStyle("6", "episode-pay", ComponentStyle.Type.Pay6));
     }
 
     @TableField("id")

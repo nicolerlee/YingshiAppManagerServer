@@ -1,16 +1,11 @@
-package com.fun.novel.service.impl;
+package com.fun.novel.service.theme;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fun.novel.dto.CreateNovelAppRequest;
 import com.fun.novel.entity.*;
-import com.fun.novel.mapper.AppThemeMapper;
 import com.fun.novel.mapper.Pay66Mapper;
 import com.fun.novel.mapper.Pay6Mapper;
-import com.fun.novel.mapper.PayBoard3Mapper;
-import com.fun.novel.service.AppCommonConfigService;
-import com.fun.novel.service.AppThemeService;
 import com.fun.novel.utils.CreateNovelTaskLogger;
 import com.fun.novel.dto.CreateNovelLogType;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,33 +39,17 @@ public class AppThemeServiceImpl implements AppThemeService {
     private static final int FILE_STEP_DELAY_MS = 1000;
     private static final String miniConfigWebPath = "src" + File.separator + "appConfig" + File.separator + "web";
     private static final String miniConfigThemePath = "src" + File.separator + "appConfig" + File.separator + "theme";
-
-    public Pay6 getPay6(String brand) {
-        LambdaQueryWrapper<Pay6> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Pay6::getBrand, brand);
-        return pay6Mapper.selectOne(wrapper);
-    }
-
-    public Pay66 getPay66(String brand) {
-        LambdaQueryWrapper<Pay66> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Pay66::getBrand, brand);
-        return pay66Mapper.selectOne(wrapper);
-    }
-
-    public ThemeEntity getThemeEntity(String brand, ComponentStyle.Type type) {
-        switch (type) {
-            case Pay6:
-                return getPay6(brand);
-            case Pay66:
-                return getPay66(brand);
-            default:
-                return null;
-        }
+    HashMap<String, String> buildEnvironment() {
+        HashMap<String, String> environment = new HashMap<>();
+        environment.put("web-path", miniConfigWebPath);
+        environment.put("theme-path", miniConfigThemePath);
+        environment.put("work-path", buildWorkPath);
+        return environment;
     }
 
     void overwriteConfigJson(String logTag, String taskId, String brand, ComponentStyle owner, List<ComponentStyle> css) {
-        String destDir = buildWorkPath + File.separator + miniConfigThemePath + File.separator + owner.getName() + File.separator + brand + File.separator + "config.json";
-        String debugDir = owner.getName() + File.separator + brand + File.separator + "config.json";
+        String destDir = buildWorkPath + File.separator + miniConfigThemePath + File.separator + owner.getNode() + File.separator + brand + File.separator + "config.json";
+        String debugDir = owner.getNode() + File.separator + brand + File.separator + "config.json";
         Path destPath = java.nio.file.Paths.get(destDir);
         if (java.nio.file.Files.exists(destPath)) {
             // taskLogger.log(taskId, logTag + "配置文件 " + destPath + " 已存在，不用生成", CreateNovelLogType.INFO); return;
@@ -108,7 +86,7 @@ public class AppThemeServiceImpl implements AppThemeService {
 
     // 本函描述将theme目录下根组件（如Pay6/Pay66）对应的小程序(brand区分)的配置文件（config.json）指定的style， 从预制的配置目录拷贝到小程序目录下
     void overwriteConfigStyle(String logTag, String taskId, String brand, ComponentStyle owner, List<ComponentStyle> css) {
-        String destDir = buildWorkPath + File.separator + miniConfigThemePath + File.separator + owner.getName() + File.separator + brand + File.separator;
+        String destDir = buildWorkPath + File.separator + miniConfigThemePath + File.separator + owner.getNode() + File.separator + brand + File.separator;
         taskLogger.log(taskId, logTag + "即将覆盖less文件 " + destDir, CreateNovelLogType.INFO);
 
 
@@ -118,7 +96,7 @@ public class AppThemeServiceImpl implements AppThemeService {
                 taskLogger.warn(taskId, logTag + "style=" + cs.getStyle() + "，不用预制style，跳过", CreateNovelLogType.INFO);
                 continue;
             }
-            String sourceDir = buildWorkPath + File.separator + miniConfigThemePath + File.separator + owner.getName() + File.separator;
+            String sourceDir = buildWorkPath + File.separator + miniConfigThemePath + File.separator + owner.getNode() + File.separator;
             sourceDir +=  "astyle" + File.separator + cs.getName() + File.separator + cs.getId() + File.separator + cs.getStyle() + ".less";
             Path sourcePath = java.nio.file.Paths.get(sourceDir);
             if (!java.nio.file.Files.exists(sourcePath)) {
@@ -152,7 +130,25 @@ public class AppThemeServiceImpl implements AppThemeService {
 
     @Override
     public void processThemeFile(String taskId, String brand, CreateNovelAppRequest.BaseConfig baseConfig, List<Runnable> rollbackActions, boolean withLogAndDelay) {
-        overwriteThemeConfig("[2-2-1]", taskId, brand, getThemeEntity(brand, ComponentStyle.Type.Pay6));
-        overwriteThemeConfig("[2-2-2]", taskId, brand, getThemeEntity(brand, ComponentStyle.Type.Pay66));
+        Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
+        overwriteThemeConfig("[2-2-1]", taskId, brand, data.getThemeEntity(brand, ComponentStyle.Type.Pay6));
+        overwriteThemeConfig("[2-2-2]", taskId, brand, data.getThemeEntity(brand, ComponentStyle.Type.Pay66));
+    }
+
+
+    @Override
+    public String getComponentConfig(String brand, String name) {
+        Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
+        return new ThemeFileRetriever(data).getComponentConfig(brand, name);
+    }
+    @Override
+    public String getComponentLess(String brand, String name, int style) {
+        Data data = new Data(buildEnvironment(),pay6Mapper, pay66Mapper);
+        return new ThemeFileRetriever(data).getComponentLess(brand, name, style);
+    }
+    @Override
+    public String getComponentSubLess(String brand, String root, String name, int id, int style) {
+        Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
+        return new ThemeFileRetriever(data).getComponentSubLess(brand, root, name, id, style);
     }
 } 

@@ -2,10 +2,8 @@ package com.fun.novel.service.impl;
 
 import com.fun.novel.dto.CreateNovelAppRequest;
 import com.fun.novel.entity.AppTheme;
-import com.fun.novel.entity.PayBoard3;
-import com.fun.novel.entity.PayDlg;
 import com.fun.novel.service.AppCommonConfigService;
-import com.fun.novel.service.AppThemeService;
+import com.fun.novel.service.theme.AppThemeService;
 import com.fun.novel.service.NovelAppLocalFileOperationService;
 import com.fun.novel.utils.CreateNovelTaskLogger;
 import com.fun.novel.dto.CreateNovelLogType;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 
 @Service
