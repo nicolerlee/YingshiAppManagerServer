@@ -2,6 +2,7 @@ package com.fun.novel.controller;
 
 import com.fun.novel.common.Result;
 import com.fun.novel.dto.CreateNovelAppRequest;
+import com.fun.novel.dto.ThemeNodeConfigDTO;
 import com.fun.novel.entity.AppCommonConfig;
 import com.fun.novel.entity.NovelApp;
 import com.fun.novel.service.*;
@@ -37,14 +38,25 @@ public class ThemeController {
     @Autowired
     private AppThemeService appThemeService;
 
-    @GetMapping("/component/config")
-    @Operation(summary = "获取组件主题配置", description = "获取按平台分组的小说应用列表")
-    public Result<String> getComponentConfig(
+    @GetMapping("/component/preconfigs")
+    @Operation(summary = "获取组件主题样式索引列表", description = "获取按平台分组的小说应用列表")
+    public Result<List<ThemeNodeConfigDTO>> getPreComponentConfigs(
             @Parameter(description = "小程序", required = true)
             @RequestParam String brand,
             @Parameter(description = "组件表名", required = true)
             @RequestParam String name) {
-        String result = appThemeService.getComponentConfig(brand, name);
+        List<ThemeNodeConfigDTO> result = appThemeService.getPreComponentConfigs(brand, name);
+        return Result.success(result);
+    }
+
+    @GetMapping("/component/config")
+    @Operation(summary = "获取组件主题配置", description = "获取按平台分组的小说应用列表")
+    public Result<ThemeNodeConfigDTO> getComponentConfig(
+            @Parameter(description = "小程序", required = true)
+            @RequestParam String brand,
+            @Parameter(description = "组件表名", required = true)
+            @RequestParam String name) {
+        ThemeNodeConfigDTO result = appThemeService.getComponentConfig(brand, name);
         return Result.success(result);
     }
 

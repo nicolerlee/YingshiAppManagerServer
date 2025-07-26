@@ -7,6 +7,7 @@ import com.fun.novel.entity.Pay66;
 import com.fun.novel.entity.ThemeEntity;
 import com.fun.novel.mapper.Pay66Mapper;
 import com.fun.novel.mapper.Pay6Mapper;
+import com.fun.novel.utils.CreateNovelTaskLogger;
 
 import java.io.File;
 import java.util.Map;
@@ -15,11 +16,15 @@ public class Data {
     public final Pay6Mapper pay6Mapper;
     public final Pay66Mapper pay66Mapper;
     public final Map<String, String> environment;
+    public CreateNovelTaskLogger taskLogger;
 
     public Data(Map<String, String> environment, Pay6Mapper pay6Mapper, Pay66Mapper pay66Mapper) {
         this.environment = environment;
         this.pay6Mapper = pay6Mapper;
         this.pay66Mapper = pay66Mapper;
+    }
+    Data bind(CreateNovelTaskLogger taskLogger) {
+        this.taskLogger = taskLogger; return this;
     }
 
     public String getWorkPath() {

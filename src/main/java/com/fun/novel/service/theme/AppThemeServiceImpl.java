@@ -3,6 +3,7 @@ package com.fun.novel.service.theme;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fun.novel.dto.CreateNovelAppRequest;
+import com.fun.novel.dto.ThemeNodeConfigDTO;
 import com.fun.novel.entity.*;
 import com.fun.novel.mapper.Pay66Mapper;
 import com.fun.novel.mapper.Pay6Mapper;
@@ -137,18 +138,27 @@ public class AppThemeServiceImpl implements AppThemeService {
 
 
     @Override
-    public String getComponentConfig(String brand, String name) {
+    public List<ThemeNodeConfigDTO> getPreComponentConfigs(String brand, String name) {
         Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
-        return new ThemeFileRetriever(data).getComponentConfig(brand, name);
+        data.bind(taskLogger);
+        return new ThemeFileRetriever(data).getPreComponentConfigs(brand, name);
+    }
+    @Override
+    public ThemeNodeConfigDTO getComponentConfig(String brand, String name) {
+        Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
+        data.bind(taskLogger);
+        return new ThemeFileRetriever(data).getAppliedComponentConfig(brand, name);
     }
     @Override
     public String getComponentLess(String brand, String name, int style) {
         Data data = new Data(buildEnvironment(),pay6Mapper, pay66Mapper);
+        data.bind(taskLogger);
         return new ThemeFileRetriever(data).getComponentLess(brand, name, style);
     }
     @Override
     public String getComponentSubLess(String brand, String root, String name, int id, int style) {
         Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
+        data.bind(taskLogger);
         return new ThemeFileRetriever(data).getComponentSubLess(brand, root, name, id, style);
     }
 } 
