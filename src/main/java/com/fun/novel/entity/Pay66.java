@@ -35,11 +35,34 @@ public class Pay66 extends ThemeEntity {
     @Schema(description = "支付盘样式，表征应用哪个支付盘样式")
     private Integer payBoardStyle;
 
+    @TableField("plane_payment_id")
+    @Schema(description = "支付盘id，表征应用哪个支付盘")
+    private Integer planePaymentId;
+
+    @TableField("plane_payment_style")
+    @Schema(description = "支付盘样式，表征应用哪个支付盘样式")
+    private Integer planePaymentStyle;
+
     // 将除brand/id外的字段，转换为List<ComponentStyle>的结果形式
     @Override
     public List<ComponentStyle> buildComponentStyles() {
         List<ComponentStyle> styles = new ArrayList<>();
         styles.add(new ComponentStyle("pay-board", ComponentStyle.Type.payBoard, this.payBoardId, this.payBoardStyle));
+        styles.add(new ComponentStyle("plane-payment", ComponentStyle.Type.payBoard, this.planePaymentId, this.planePaymentStyle));
         return styles;
+    }
+
+    @Override
+    public void updateTable(String brand, java.util.List<ComponentStyle> styles) {
+        for (ComponentStyle style : styles) {
+            if (style.getType() == ComponentStyle.Type.payBoard) {
+                this.payBoardId = style.getId();
+                this.payBoardStyle = style.getStyle();
+            } else if (style.getType() == ComponentStyle.Type.planePayment) {
+                this.planePaymentId = style.getId();
+                this.planePaymentStyle = style.getStyle();
+            }
+        }
+        this.brand = brand;
     }
 }

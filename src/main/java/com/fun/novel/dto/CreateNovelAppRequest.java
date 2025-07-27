@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Schema(description = "创建小说小程序请求体")
@@ -156,5 +158,27 @@ public class CreateNovelAppRequest {
         @Schema(description = "是否Iaa模式")
         private Boolean iaaMode;
 
+    }
+
+    @Schema(description = "主题配置")
+    @JsonProperty("themeConfig")
+    private List<ThemeConfig> themeConfig;
+
+    @Data
+    public static class ThemeConfig {
+        @Schema(description = "主题名称")
+        private String name;
+        @Schema(description = "组件列表")
+        private java.util.List<ComponentThemeConfig> components;
+    }
+
+    @Data
+    public static class ComponentThemeConfig {
+        @Schema(description = "组件名称")
+        private String name;
+        @Schema(description = "组件 ID")
+        private int id;
+        @Schema(description = "组件样式")
+        private int style;
     }
 } 

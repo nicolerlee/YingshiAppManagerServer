@@ -11,4 +11,6 @@ public interface AppThemeService {
     ThemeNodeConfigDTO getComponentConfig(String brand, String name);
     String getComponentLess(String brand, String name, int style);
     String getComponentSubLess(String brand, String root, String name, int id, int style);
+
+    void processAllThemeFiles(String taskId, CreateNovelAppRequest params, List<Runnable> rollbackActions);
 } 

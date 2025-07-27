@@ -66,4 +66,37 @@ public class Data {
                 return null;
         }
     }
+    public void updateTable(String brand, ComponentStyle.Type type, java.util.List<ComponentStyle> styles) {
+        ThemeEntity themeEntity = getThemeEntity(brand, type);
+        if (themeEntity != null) {
+            themeEntity.updateTable(brand, styles);
+            write2Table(brand, themeEntity);
+        } else {
+            themeEntity = ThemeEntity.create(brand, type, styles);
+            create2Table(brand, themeEntity);
+        }
+
+    }
+
+    void write2Table(String brand, ThemeEntity themeEntity) {
+        switch (themeEntity.getComponentStyle().getType()) {
+            case Pay6:
+                pay6Mapper.update((Pay6) themeEntity, new LambdaQueryWrapper<Pay6>().eq(Pay6::getBrand, brand));
+                break;
+            case Pay66:
+                pay66Mapper.update((Pay66) themeEntity, new LambdaQueryWrapper<Pay66>().eq(Pay66::getBrand, brand));
+                break;
+        }
+    }
+
+    void create2Table(String brand, ThemeEntity themeEntity) {
+        switch (themeEntity.getComponentStyle().getType()) {
+            case Pay6:
+                pay6Mapper.insert((Pay6) themeEntity);
+                break;
+            case Pay66:
+                pay66Mapper.insert((Pay66) themeEntity);
+                break;
+        }
+    }
 }

@@ -1,6 +1,5 @@
 package com.fun.novel.service.theme;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fun.novel.dto.CreateNovelAppRequest;
 import com.fun.novel.dto.ThemeNodeConfigDTO;
@@ -136,6 +135,12 @@ public class AppThemeServiceImpl implements AppThemeService {
         overwriteThemeConfig("[2-2-2]", taskId, brand, data.getThemeEntity(brand, ComponentStyle.Type.Pay66));
     }
 
+    public void processThemeFile(String taskId, String brand) {
+        Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
+        overwriteThemeConfig("[2-2-1]", taskId, brand, data.getThemeEntity(brand, ComponentStyle.Type.Pay6));
+        overwriteThemeConfig("[2-2-2]", taskId, brand, data.getThemeEntity(brand, ComponentStyle.Type.Pay66));
+    }
+
 
     @Override
     public List<ThemeNodeConfigDTO> getPreComponentConfigs(String brand, String name) {
@@ -160,5 +165,24 @@ public class AppThemeServiceImpl implements AppThemeService {
         Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
         data.bind(taskLogger);
         return new ThemeFileRetriever(data).getComponentSubLess(brand, root, name, id, style);
+    }
+
+    @Override
+    public void processAllThemeFiles(String taskId, CreateNovelAppRequest params, List<Runnable> rollbackActions) {
+        CreateNovelAppRequest.CommonConfig commonConfig = params.getCommonConfig();
+        String brand = commonConfig.getBuildCode();
+        Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
+        data.bind(taskLogger);
+        String logTag = "[2-2-1]";
+        taskLogger.log(taskId, logTag + "processAllThemeFiles 更新到数据库", CreateNovelLogType.INFO);
+        List<CreateNovelAppRequest.ThemeConfig> themeConfigs = params.getThemeConfig();
+        int i = 0;
+        for (CreateNovelAppRequest.ThemeConfig themeConfig : themeConfigs) {
+            i += 1;
+            new ThemeFilePrepare(data).prepareThemeFile(taskId + "-" + i, themeConfig, brand);
+        }
+        taskLogger.log(taskId, logTag + "processAllThemeFiles 更新到代码", CreateNovelLogType.INFO);
+        processThemeFile(taskId, brand);
+        taskLogger.log(taskId, logTag + "processAllThemeFiles 结束", CreateNovelLogType.INFO);
     }
 } 

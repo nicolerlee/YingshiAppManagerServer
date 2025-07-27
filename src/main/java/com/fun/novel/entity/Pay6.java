@@ -48,7 +48,7 @@ public class Pay6 extends ThemeEntity {
     public List<ComponentStyle> buildComponentStyles() {
         List<ComponentStyle> styles = new ArrayList<>();
         styles.add(new ComponentStyle("pay-board", ComponentStyle.Type.payBoard, this.payBoardId, this.payBoardStyle));
-        styles.add(new ComponentStyle("good-item", ComponentStyle.Type.pay6Item, this.goodItemId, this.goodItemStyle));
+        styles.add(new ComponentStyle("good-item", ComponentStyle.Type.goodItem, this.goodItemId, this.goodItemStyle));
         return styles;
     }
 } 
