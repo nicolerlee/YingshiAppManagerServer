@@ -117,15 +117,44 @@ public class AppThemeServiceImpl implements AppThemeService {
         taskLogger.log(taskId, logTag + "完成覆盖less文件 " + destDir, CreateNovelLogType.INFO);
     }
 
+    private void copyDirectoryRecursivelyNoOverwrite(java.nio.file.Path source, java.nio.file.Path target) throws java.io.IOException {
+        if (java.nio.file.Files.isDirectory(source)) {
+            if (java.nio.file.Files.notExists(target)) {
+                java.nio.file.Files.createDirectories(target);
+            }
+            try (java.nio.file.DirectoryStream<java.nio.file.Path> entries = java.nio.file.Files.newDirectoryStream(source)) {
+                for (java.nio.file.Path entry : entries) {
+                    copyDirectoryRecursivelyNoOverwrite(entry, target.resolve(entry.getFileName()));
+                }
+            }
+        } else {
+            if (java.nio.file.Files.notExists(target)) {
+                java.nio.file.Files.copy(source, target);
+            }
+        }
+    }
+
     void overwriteThemeConfig(String logTag, String taskId, String brand, ThemeEntity themeEntity) {
+        ComponentStyle root = themeEntity.getComponentStyle();
+        taskLogger.log(taskId, logTag + "process 模块" + root.getName() +  " brand=" + brand, CreateNovelLogType.INFO);
+        String rootDir = buildWorkPath + File.separator + miniConfigThemePath + File.separator + root.getNode() + File.separator + brand;
+        String sourceDir = buildWorkPath + File.separator + miniConfigThemePath + File.separator + root.getNode() + File.separator + "fun";
+        Path rootPath = java.nio.file.Paths.get(rootDir);
+        Path sourcePath = java.nio.file.Paths.get(sourceDir);
+        try {
+            taskLogger.log(taskId, logTag + "process 模块" + root.getName() +  " brand=" + brand + ", 重新创建文件夹", CreateNovelLogType.INFO);
+            copyDirectoryRecursivelyNoOverwrite(sourcePath, rootPath);
+        } catch (Exception e) {
+            taskLogger.warn(taskId, logTag + "创建目录 " + rootPath + " 失败: " + e.getMessage(), CreateNovelLogType.INFO);
+        }
+
         if (themeEntity == null) {
             taskLogger.log(taskId, logTag + "themeEntity为空，啥也不做, brand=" + brand, CreateNovelLogType.INFO);
             return;
         }
-        taskLogger.log(taskId, logTag + "process 模块" + themeEntity.getComponentStyle().getName() +  " brand=" + brand, CreateNovelLogType.INFO);
         List<ComponentStyle> css = themeEntity.buildComponentStyles();
-        overwriteConfigJson(logTag, taskId, brand, themeEntity.getComponentStyle(), css);
-        overwriteConfigStyle(logTag, taskId, brand, themeEntity.getComponentStyle(), css);
+        overwriteConfigJson(logTag, taskId, brand, root, css);
+        overwriteConfigStyle(logTag, taskId, brand, root, css);
     }
 
     @Override
@@ -174,8 +203,8 @@ public class AppThemeServiceImpl implements AppThemeService {
         Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
         data.bind(taskLogger);
         String logTag = "[2-2-1]";
-        taskLogger.log(taskId, logTag + "processAllThemeFiles 更新到数据库", CreateNovelLogType.INFO);
         List<CreateNovelAppRequest.ThemeConfig> themeConfigs = params.getThemeConfig();
+        taskLogger.log(taskId, logTag + "processAllThemeFiles 更新到数据库" + themeConfigs, CreateNovelLogType.INFO);
         int i = 0;
         for (CreateNovelAppRequest.ThemeConfig themeConfig : themeConfigs) {
             i += 1;

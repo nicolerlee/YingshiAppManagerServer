@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 @CrossOrigin(origins = {
     "http://localhost:5173",
     "http://127.0.0.1:5173",
-    "http://172.17.5.80:5173",
+    "http://172.17.5.80:5173", "http://172.17.5.134:5173",
     "http://172.17.5.80:8080"
 }, allowCredentials = "true")
 public class NovelAppCreateController {

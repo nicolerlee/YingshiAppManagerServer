@@ -51,4 +51,18 @@ public class Pay6 extends ThemeEntity {
         styles.add(new ComponentStyle("good-item", ComponentStyle.Type.goodItem, this.goodItemId, this.goodItemStyle));
         return styles;
     }
+
+    @Override
+    public void updateTable(String brand, java.util.List<ComponentStyle> styles) {
+        for (ComponentStyle style : styles) {
+            if (style.getType() == ComponentStyle.Type.payBoard) {
+                this.payBoardId = style.getId();
+                this.payBoardStyle = style.getStyle();
+            } else if (style.getType() == ComponentStyle.Type.goodItem) {
+                this.goodItemId = style.getId();
+                this.goodItemStyle = style.getStyle();
+            }
+        }
+        this.brand = brand;
+    }
 } 
