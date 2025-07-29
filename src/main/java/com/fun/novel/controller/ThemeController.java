@@ -38,6 +38,19 @@ public class ThemeController {
     @Autowired
     private AppThemeService appThemeService;
 
+    @GetMapping("/component/apply-root-preset")
+    @Operation(summary = "应用组件默认主题样式", description = "获取按平台分组的小说应用列表")
+    public Result<String> applyRootPreset(
+            @Parameter(description = "小程序", required = true)
+            @RequestParam String brand,
+            @Parameter(description = "组件对应代码的节点版本", required = true)
+            @RequestParam int version,
+            @Parameter(description = "组件对应代码的节点名", required = true)
+            @RequestParam String node) {
+        String result = appThemeService.applyRootPreset("xxxxx", brand, version, node);
+        return Result.success(result);
+    }
+
     @GetMapping("/component/preconfigs")
     @Operation(summary = "获取组件主题样式索引列表", description = "获取按平台分组的小说应用列表")
     public Result<List<ThemeNodeConfigDTO>> getPreComponentConfigs(

@@ -204,14 +204,21 @@ public class AppThemeServiceImpl implements AppThemeService {
         data.bind(taskLogger);
         String logTag = "[2-2-1]";
         List<CreateNovelAppRequest.ThemeConfig> themeConfigs = params.getThemeConfig();
-        taskLogger.log(taskId, logTag + "processAllThemeFiles 更新到数据库" + themeConfigs, CreateNovelLogType.INFO);
         int i = 0;
         for (CreateNovelAppRequest.ThemeConfig themeConfig : themeConfigs) {
             i += 1;
-            new ThemeFilePrepare(data).prepareThemeFile(taskId + "-" + i, themeConfig, brand);
+            new ThemeFilePrepare(data).applyRootPreset(taskId, brand, themeConfig.getVersion(), themeConfig.getNode());
+            taskLogger.log(taskId, logTag + "processAllThemeFiles 组件" + themeConfig.getNode() + "更新到代码", CreateNovelLogType.INFO);
         }
-        taskLogger.log(taskId, logTag + "processAllThemeFiles 更新到代码", CreateNovelLogType.INFO);
-        processThemeFile(taskId, brand);
+
+        //processThemeFile(taskId, brand);
         taskLogger.log(taskId, logTag + "processAllThemeFiles 结束", CreateNovelLogType.INFO);
+    }
+
+    @Override
+    public String applyRootPreset(String taskId, String brand, int version, String node) {
+        Data data = new Data(buildEnvironment(), pay6Mapper, pay66Mapper);
+        data.bind(taskLogger);
+        return new ThemeFilePrepare(data).applyRootPreset(taskId, brand, version, node);
     }
 } 

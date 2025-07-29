@@ -167,9 +167,11 @@ public class CreateNovelAppRequest {
     @Data
     public static class ThemeConfig {
         @Schema(description = "主题名称")
-        private String name;
-        @Schema(description = "组件列表")
-        private java.util.List<ComponentThemeConfig> components;
+        private String node;
+        @Schema(description = "版本")
+        private int version;
+        //@Schema(description = "组件列表")
+        //private java.util.List<ComponentThemeConfig> components;
     }
 
     @Data

@@ -309,7 +309,7 @@ public class NovelAppLocalFileOperationServiceImpl implements NovelAppLocalFileO
     }
     // 2. processThemeFile
     private void processThemeFile(String taskId, String buildCode, CreateNovelAppRequest.BaseConfig baseConfig, List<Runnable> rollbackActions, boolean withLogAndDelay) {
-        appThemeService.processThemeFile(taskId, buildCode, baseConfig, rollbackActions, withLogAndDelay);
+        //appThemeService.processThemeFile(taskId, buildCode, baseConfig, rollbackActions, withLogAndDelay);
     }
     // 3. processDouyinPrefetchFile
     private void processDouyinPrefetchFile(String taskId, String buildCode, String platform, List<Runnable> rollbackActions, boolean withLogAndDelay) {
